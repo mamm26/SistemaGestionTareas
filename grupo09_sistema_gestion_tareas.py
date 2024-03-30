@@ -150,10 +150,25 @@ while menu != str(menuMax):
         
     # Ver Tareas pendientes o completadas
     elif menu == "2":
-        print("Próximamente...")
+         for idTarea, info in enumerate (tareas):
+        tareaInfo = info [0]
+        estadoInfo = info [1]
+        print(f"ID: {idTarea + 1} - Titulo: +[tareaInfo[1]}")
+        print(f" - Description: {tareaInfo[1]}")
+        print(f" - fecha: {tareaInfo[2]}")
+        print(f" - costo: {tareaInfo[3]}")
+        print(f" - estado: {estadoInfo}")
+    
     # Marcar Tarea como completada
     elif menu == "3":
-        print("Próximamente...")
+  print("mostrarTareaCompletada")
+   tareaId = int(input("Digita el número de tarea a completar: "))
+   tareaId -= 1
+   tareas[tareaId][1] = estados[1]
+   print(f"La tarea cambió su estado a {tareas[tareaId][1]}"
+   
+
+        
     # Editar o borrar Tareas
     elif menu == "4":
         print("Próximamente...")
