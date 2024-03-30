@@ -4,4 +4,3 @@
 
 * Miguel Madrigal Murillo
 * Carlos Castrillo Rivas
-* Erick Vera Meneses
