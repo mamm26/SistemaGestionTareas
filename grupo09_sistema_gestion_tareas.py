@@ -8,8 +8,15 @@ import datetime
 
 # Formato [[tarea1, estado], [tarea2, estado]...]
 # Indexes: 0: Titulo - 1: Descrip - 2: Fecha - 3: Costo
-tareas = []
+tareas = [[["Tarea 1", "Prueba", "29-09-2024", 400], "Pendiente"]]      
+#               0            1             
 estados = ["Pendiente", "Completada"]
+
+
+arreglo = [0, 878687, 78978]
+arreglos = [arreglo, [6, 9]]
+
+print(arreglos)
 
 def divisor():
     print("=======================================")
@@ -150,14 +157,19 @@ while menu != str(menuMax):
         
     # Ver Tareas pendientes o completadas
     elif menu == "2":
+        if len(tareas) == 0:
+            print("NO hay tareas")
+            continue
+    
         for idTarea, info in enumerate (tareas):
-            tareaInfo = info[0]
+            informacion = info[0]
             estadoInfo = info[1]
-            print(f"ID: {idTarea + 1} - Titulo: {tareaInfo[0]}")
-            print(f" - Description: {tareaInfo[1]}")
-            print(f" - fecha: {tareaInfo[2]}")
-            print(f" - costo: {tareaInfo[3]}")
-            print(f" - estado: {estadoInfo}")
+            
+            print(f"ID: {idTarea  + 1} - Titulo: {informacion[0]}")
+            print(f" - Description: {informacion[1]}")
+            print(f" - fecha: {informacion[2]}")
+            print(f" - costo: {informacion[3]}")
+            print(f" - estado: {info[1]}")
     
     # Marcar Tarea como completada
     elif menu == "3":
@@ -176,7 +188,52 @@ while menu != str(menuMax):
         
     # Editar o borrar Tareas
     elif menu == "4":
-        print("Próximamente...")
+        menu2 = "0"
+
+        while menu2 != "3":
+            print("1- Editar tarea")
+            print("2- Borrar tarea")
+            print("3- Volver")
+
+            menu2 = input("Digite la opción: ")
+
+            # Editar
+            if menu2 == "1":
+                mostrarListaTareas()
+
+                numeroTarea = int(input("Digite el número de tarea: "))
+                if numeroTarea <= 0 or len(tareas) < numeroTarea:
+                    print("No existe la tarea")
+                    continue
+
+                # Corregimos para localizar el indice correcto
+                numeroTarea -= 1
+
+                titulo = input("Ingrese el nuevo titulo: ")
+                descripcion = input("Ingrese la nueva descripción: ")
+                fecha = input("Ingrese la nueva fecha: ")
+                costo = float(input("Ingrese el nuevo costo: "))
+
+                tareaInfo = [titulo, descripcion, fecha, costo]
+                estadoInfo = tareas[numeroTarea][1]
+
+                tareas[numeroTarea] = [tareaInfo, estadoInfo]
+
+            # Borrar tarea
+            elif menu2 == "2":
+                mostrarListaTareas()
+
+                numeroTarea = int(input("Digite el número de tarea: "))
+                if numeroTarea <= 0 or len(tareas) < numeroTarea:
+                    print("No existe la tarea")
+                    continue
+
+                # Corregimos para localizar el indice correcto
+                numeroTarea -= 1
+
+                tareas.pop(numeroTarea)
+                
+        
     # Guardar y Cargar Tareas
     elif menu == "5":
         print("Próximamente...")
