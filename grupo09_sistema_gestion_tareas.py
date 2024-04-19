@@ -9,15 +9,10 @@ import os
 
 # Formato [[tarea1, estado], [tarea2, estado]...]
 # Indexes: 0: Titulo - 1: Descrip - 2: Fecha - 3: Costo
-tareas = [[["Tarea 1", "Prueba", "29-09-2024", 400], "Pendiente"]]      
+tareas = []      
 #               0            1             
 estados = ["Pendiente", "Completada"]
 
-
-arreglo = [0, 878687, 78978]
-arreglos = [arreglo, [6, 9]]
-
-print(arreglos)
 
 def divisor():
     print("=======================================")
@@ -92,24 +87,30 @@ def costeTareas():
 
     return f"- Costo Tareas Pendientes: {costoPendientes}.\n - Costo Tareas Completadas: {costoCompletadas}.\n - Costo TOTAL: {costoTotal}\n"
 
-def cargarTareasArchivo():
+def cargarTareasArchivo(alInicio = False):
     if os.path.exists("tareas.txt") == False:
-        print("El archivo tareas.txt NO existe.")
+        if alInicio == False:
+            print("El archivo tareas.txt NO existe.")
         return
 
+    tareas.clear()
     archivo = open("tareas.txt", "r")
-    listaTareas = []
 
     for linea in archivo:
-        tareaArchivo = linea.split(",")
-        print(tareaArchivo)
-        tareaInfoTemp = [tareaArchivo[0], tareaArchivo[1], tareaArchivo[2], tareaArchivo[3]]
+        tareaArchivo = linea.split("::")
+
+        fechaFormato = datetime.datetime.strptime(tareaArchivo[2], "%Y-%m-%d")
+        tareaInfoTemp = [tareaArchivo[0], tareaArchivo[1], fechaFormato, tareaArchivo[3]]
         tareaEstadoTemp = tareaArchivo[4]
+        tareaEstadoTemp = tareaEstadoTemp.replace("\n", "")
 
         tareaDatosTemp = [tareaInfoTemp, tareaEstadoTemp]
         tareas.append(tareaDatosTemp)
 
-cargarTareasArchivo()    
+    if alInicio == False:
+        print("CORRECTO: Tareas cargadas desde tareas.txt")
+
+cargarTareasArchivo(True)    
 # Menu
 menu = "0"
 # Sólo sale con la opción 7 (Salir)
@@ -243,7 +244,7 @@ while menu != str(menuMax):
 
                 titulo = input("Ingrese el nuevo titulo (Deja en blanco para ignorar): ")
                 descripcion = input("Ingrese la nueva descripción (Deja en blanco para ignorar): ")
-                fecha = input("Ingrese la nueva fecha (Deja en blanco para ignorar): ")
+                fecha = input("Ingrese la nueva fecha (DD-MM-YYYY | Ejemplo: 29-03-2024) (Deja en blanco para ignorar): ")
                 costo = input("Ingrese el nuevo costo (Deja en blanco para ignorar): ")
                 if costo == "":
                     costo = "0"
@@ -259,10 +260,27 @@ while menu != str(menuMax):
                     descripcion = datosTarea[1]
                 if fecha == "":
                     fecha = datosTarea[2]
+                else:
+                    # Verificamos que sea una fecha válida
+                    while esFechaValida(fecha) == False:
+                        print("ERROR: Fecha inválida.")
+                        fecha = input("Ingrese la Fecha (DD-MM-YYYY | Ejemplo: 29-03-2024): ")
+
+                    hoy = datetime.datetime.now()
+                    
+                    dia, mes, anno = map(int, fecha.split("-"))
+                    fechaFormato = datetime.datetime(anno, mes, dia)
+
+                    while fechaFormato <= hoy:
+                        print("ERROR: Digite una fecha posterior a hoy.")
+                        fecha = input("Ingrese la Fecha (DD-MM-YYYY | Ejemplo: 29-03-2024): ")
+                        dia, mes, anno = map(int, fecha.split("-"))
+                        fechaFormato = datetime.datetime(anno, mes, dia)
+                    
                 if costo == 0:
                     costo = datosTarea[3]
 
-                tareaInfo = [titulo, descripcion, fecha, costo]
+                tareaInfo = [titulo, descripcion, fechaFormato, costo]
             
 
                 tareas[numeroTarea] = [tareaInfo, estadoInfo]
@@ -280,29 +298,51 @@ while menu != str(menuMax):
                 numeroTarea -= 1
 
                 tareas.pop(numeroTarea)
+            elif menu2 == "3":
+                break
+            else:
+                print("ERROR: Elige una opción válida")
+                menu2 = "0"
                 
         
-    # Guardar y Cargar Tareas
+    # Guardar Tareas
     elif menu == "5":
         divisor()
-        print("GUARDAR TAREAS")
+        print("GUARDAR Y CARGAR TAREAS")
         divisor()
 
-        archivo = open("tareas.txt", "w")
-        datos = ""
-        for tarea in tareas:
-            tareaInfo = tarea[0]
-            tareaEstado = tarea[1]
+        menu3 = "0"
 
-            tareaDatos = ",".join(str(n) for n in tareaInfo)
-            tareaDatos = f"{tareaDatos},{tareaEstado}"
+        while menu3 != "3":
+            print("1- Guardar tareas")
+            print("2- Cargar tareas")
+            print("3- Volver al menú principal")
+            menu3 = input("Elige la opción: ")
+        
+            if menu3 == "1":            
+                archivo = open("tareas.txt", "w")
+                datos = ""
+                for tarea in tareas:
+                    tareaInfo = tarea[0]
+                    tareaEstado = tarea[1]
 
-            datos = f"{datos}{tareaDatos}\n"
+                    tareaDatos = "::".join(str(n).replace(" 00:00:00", "") for n in tareaInfo)
+                    tareaDatos = f"{tareaDatos}::{tareaEstado}"
 
-        archivo.write(datos)
-        archivo.close()
+                    datos = f"{datos}{tareaDatos}\n"
 
-        print("EXITO: Tareas Guardadas en tareas.txt")
+                archivo.write(datos)
+                archivo.close()
+
+                print("EXITO: Tareas Guardadas en tareas.txt")
+                
+            elif menu3 == "2":
+                cargarTareasArchivo()
+            elif menu3 == "3":
+                break
+            else:
+                print("ERROR: Elige una opción correcta")
+                menu3 = "0"
         
 
     # Estadísticas simples
@@ -321,7 +361,7 @@ while menu != str(menuMax):
               "============",
               "\nCosto Tareas:\n",
               costeTareas(),
-              "============",
+              "============"
               )
     # Salir
     elif menu == str(menuMax):
