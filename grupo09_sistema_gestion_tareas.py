@@ -5,6 +5,7 @@
 # https://github.com/mamm26/SistemaGestionTareas
 
 import datetime
+import os
 
 # Formato [[tarea1, estado], [tarea2, estado]...]
 # Indexes: 0: Titulo - 1: Descrip - 2: Fecha - 3: Costo
@@ -90,7 +91,25 @@ def costeTareas():
     costoTotal = costoPendientes + costoCompletadas
 
     return f"- Costo Tareas Pendientes: {costoPendientes}.\n - Costo Tareas Completadas: {costoCompletadas}.\n - Costo TOTAL: {costoTotal}\n"
-        
+
+def cargarTareasArchivo():
+    if os.path.exists("tareas.txt") == False:
+        print("El archivo tareas.txt NO existe.")
+        return
+
+    archivo = open("tareas.txt", "r")
+    listaTareas = []
+
+    for linea in archivo:
+        tareaArchivo = linea.split(",")
+        print(tareaArchivo)
+        tareaInfoTemp = [tareaArchivo[0], tareaArchivo[1], tareaArchivo[2], tareaArchivo[3]]
+        tareaEstadoTemp = tareaArchivo[4]
+
+        tareaDatosTemp = [tareaInfoTemp, tareaEstadoTemp]
+        tareas.append(tareaDatosTemp)
+
+cargarTareasArchivo()    
 # Menu
 menu = "0"
 # Sólo sale con la opción 7 (Salir)
@@ -157,6 +176,10 @@ while menu != str(menuMax):
         
     # Ver Tareas pendientes o completadas
     elif menu == "2":
+        divisor()
+        print("TAREAS PENDIENTES O COMPLETADAS")
+        divisor()
+        
         if len(tareas) == 0:
             print("NO hay tareas")
             continue
@@ -165,16 +188,20 @@ while menu != str(menuMax):
             informacion = info[0]
             estadoInfo = info[1]
             
-            print(f"ID: {idTarea  + 1} - Titulo: {informacion[0]}")
+            print(f"ID: {idTarea  + 1}")
+            print(f" - Titulo: {informacion[0]}")
             print(f" - Description: {informacion[1]}")
-            print(f" - fecha: {informacion[2]}")
-            print(f" - costo: {informacion[3]}")
-            print(f" - estado: {info[1]}")
+            print(f" - Fecha: {informacion[2]}")
+            print(f" - Costo: {informacion[3]}")
+            print(f" - Estado: {estadoInfo}")
     
     # Marcar Tarea como completada
     elif menu == "3":
         
-        print("mostrarTareaCompletada")
+        divisor()
+        print("COMPLETAR TAREAS")
+        divisor()
+        
         mostrarListaTareas()
         tareaId = int(input("Digita el número de tarea a completar: "))
         if tareaId <= 0 or len(tareas) < tareaId:
@@ -188,12 +215,17 @@ while menu != str(menuMax):
         
     # Editar o borrar Tareas
     elif menu == "4":
+
+        divisor()
+        print("EDITAR O BORRAR TAREAS")
+        divisor()
+        # Menú para editar o borrar las tareas
         menu2 = "0"
 
         while menu2 != "3":
             print("1- Editar tarea")
             print("2- Borrar tarea")
-            print("3- Volver")
+            print("3- Volver al menú principal")
 
             menu2 = input("Digite la opción: ")
 
@@ -209,13 +241,29 @@ while menu != str(menuMax):
                 # Corregimos para localizar el indice correcto
                 numeroTarea -= 1
 
-                titulo = input("Ingrese el nuevo titulo: ")
-                descripcion = input("Ingrese la nueva descripción: ")
-                fecha = input("Ingrese la nueva fecha: ")
-                costo = float(input("Ingrese el nuevo costo: "))
+                titulo = input("Ingrese el nuevo titulo (Deja en blanco para ignorar): ")
+                descripcion = input("Ingrese la nueva descripción (Deja en blanco para ignorar): ")
+                fecha = input("Ingrese la nueva fecha (Deja en blanco para ignorar): ")
+                costo = input("Ingrese el nuevo costo (Deja en blanco para ignorar): ")
+                if costo == "":
+                    costo = "0"
+                costo = float(costo)
+
+                datosTareaOriginal = tareas[numeroTarea]
+                datosTarea = tareas[numeroTarea][0]
+                estadoInfo = datosTareaOriginal[1]
+
+                if titulo == "":
+                    titulo = datosTarea[0]
+                if descripcion == "":
+                    descripcion = datosTarea[1]
+                if fecha == "":
+                    fecha = datosTarea[2]
+                if costo == 0:
+                    costo = datosTarea[3]
 
                 tareaInfo = [titulo, descripcion, fecha, costo]
-                estadoInfo = tareas[numeroTarea][1]
+            
 
                 tareas[numeroTarea] = [tareaInfo, estadoInfo]
 
@@ -236,7 +284,26 @@ while menu != str(menuMax):
         
     # Guardar y Cargar Tareas
     elif menu == "5":
-        print("Próximamente...")
+        divisor()
+        print("GUARDAR TAREAS")
+        divisor()
+
+        archivo = open("tareas.txt", "w")
+        datos = ""
+        for tarea in tareas:
+            tareaInfo = tarea[0]
+            tareaEstado = tarea[1]
+
+            tareaDatos = ",".join(str(n) for n in tareaInfo)
+            tareaDatos = f"{tareaDatos},{tareaEstado}"
+
+            datos = f"{datos}{tareaDatos}\n"
+
+        archivo.write(datos)
+        archivo.close()
+
+        print("EXITO: Tareas Guardadas en tareas.txt")
+        
 
     # Estadísticas simples
     elif menu == "6":
